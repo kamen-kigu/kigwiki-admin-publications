@@ -1,6 +1,5 @@
 ---
 title: Feeds are today’s exhibition spaces
-slug: /publications/posting-is-art
 tags:
   - ramblings
 description: Feeds are where posts turn into performances, and performances become expression. What will you put on display?
