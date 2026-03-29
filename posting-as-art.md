@@ -4,6 +4,7 @@ tags:
   - ramblings
 description: Feeds are where posts turn into performances, and performances become expression. What will you put on display?
 authors: admin
+slug: /posting-as-art
 ---
 
 In a world of endless content, posting itself becomes a form of worldbuilding, a way to express oneself and their own unique perspectives. A form of art in it's own right.
