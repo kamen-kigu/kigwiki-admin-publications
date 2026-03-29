@@ -1,6 +1,7 @@
 ---
 title: Intro to Kig.wiki Publications
 description: Hello from the "handler" of Kig.wiki, re-iterating goals and the purpose of the Publications section.
+slug: /admin-intro
 authors: admin
 ---
 
