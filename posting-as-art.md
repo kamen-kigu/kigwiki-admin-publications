@@ -42,7 +42,7 @@ Have your posts tinted with your own unique style, see beauty and love in all th
 
 Social media brings another dimension to one's performances. Sometimes the reaction itself becomes part of the work, blending the lines between the artists and their audiences. Let the spectator reactions be a part of the performance. Revel in the suspension of disbelief, let your world be a portal to another reality meant to be encountered only when someone scrolls through their feed, let it break away from the boring and mundane texture of everyday life.
 
-Feeds are today's exhibition spaces. Dare I argue they are even the most critical form of expression and art in current times, the art of the post and coasting of the feed.
+Feeds are today's exhibition spaces. Dare I argue they are even the single most influential form of expression and art in current times, the art of the post and coasting of the feed.
 
 Not because they're perfect or prestigious, but because they're where people are looking, and where expression is happening in real time. A single post rarely carries much weight, but a series of posts can tell a story, a world, a moment, a feeling. Treat your feed not as a highlight reel or a proof of existence, but as a space where something can happen.
 
