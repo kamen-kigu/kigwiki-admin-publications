@@ -7,7 +7,7 @@ authors: admin
 
 tldr: Welcome to the Publications section of Kig.wiki, a spot for contributors to have their own spaces to write about Kigurumi topics and share their own experiences.
 
-<!-- truncate -->
+{/* truncate */}
 
 This has been a section I've been contemplating for a while now, and I'm finally getting around to it.
 

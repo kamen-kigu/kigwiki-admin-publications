@@ -9,7 +9,7 @@ slug: /posting-as-art
 
 In a world of endless content, posting itself becomes a form of worldbuilding, a way to express oneself and their own unique perspectives. A form of art in it's own right.
 
-<!-- truncate -->
+{/* truncate */}
 
 ## Posting is Art
 
