@@ -4,6 +4,7 @@ description: Hello from the "handler" of Kig.wiki, re-iterating goals and the pu
 slug: /admin-intro
 canonical_url: https://kig.wiki/publications/admin-intro
 authors: admin
+date: 2026-03-28T10:00
 ---
 
 tldr: Welcome to the Publications section of Kig.wiki, a spot for contributors to have their own spaces to write about Kigurumi topics and share their own experiences.
