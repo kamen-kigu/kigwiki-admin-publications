@@ -7,6 +7,8 @@ tags:
 description: "History of the term Animegao, and how it came to be."
 authors: admin
 date: 2026-04-23T10:00
+slug: /animegao-history
+canonical_url: https://kig.wiki/publications/animegao-history
 ---
 
 # What is Animegao Kigurumi?
