@@ -20,6 +20,7 @@ Animegao is a transliteration of the Japanese phrase アニメ顔, literally "an
 It is not a term that is generally used in Japan, but does find rare usage in some contexts primarily in hashtags, SEO, or other outreach oriented contexts towards international audiences.
 
 While the term has largely faded away in modern western contexts, it did previously find usage among some groups of kigurumi performers as an identity mark of sorts, but also as a unique SEO term some western makers reviled in to capitalize on the term for their own gain.
+Names need not be specified here, the makers who did so are largely of a bygone era and not intended to be vilanized over past actions, it is however worth a mention in the historical context.
 
 ## Canonization via Wikipedia
 
