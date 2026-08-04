@@ -99,7 +99,7 @@ From what details we do have on the term アニメ顔 (animegao), the first clea
 
 Terminology was still fresh back then for many an emerging space, and Kemono/Furry was no exception. "ファースーツ" is a transliteration of fursuit, and while kemonā did exist as a term, kemono style kigurumi costumes were still in their infancy as a hobbyist space. The term Kigurumi covers multiple genres of full body costumes, and it isn't unreasonable to see how some may have wanted the term to specifically be used for their preferred genre.
 
-I do agree some with the Wikipedia user KurisuTsurifu and their attempted edit in 2007. I dont think its a stretch to assume the doll connection was made when coining "animegao kigurumi" and the anonymous Wikipedia user wanted to use generic terms doll fans were using to differentiate between anime and not, likely not aware that bishoujo kigurumi was a term that was already in use.
+I do agree some with the Wikipedia user KurisuTsurifu and their attempted edit in 2007. I don't think its a stretch to assume the doll connection was made when coining "animegao kigurumi" and the anonymous Wikipedia user wanted to use generic terms doll fans were using to differentiate between anime and not, likely not aware that bishoujo kigurumi was a term that was already in use.
 
 Anyways, thats my theory, my Animegao theory.
 
