@@ -9,13 +9,13 @@ canonical_url: https://kig.wiki/publications/posting-as-art
 date: 2026-03-29T10:00
 ---
 
-In a world of endless content, posting itself becomes a form of worldbuilding, a way to express oneself and their own unique perspectives. A form of art in it's own right.
+In a world of endless content, posting itself becomes a form of world building, a way to express oneself and their own unique perspectives. A form of art in it's own right.
 
 {/* truncate */}
 
 ## Posting is Art
 
-Hyperonline, doomscrolling, a constant barrage of information and content. In the past conventions were the primary way someone might see kigurumi, but with social media, streaming, and other forms I'd argue most people see kigurumi through feeds.
+Hyper-online, doomscrolling, a constant barrage of information and content. In the past conventions were the primary way someone might see kigurumi, but with social media, streaming, and other forms I'd argue most people see kigurumi through feeds.
 
 Great posting should be performative and egoless, a freeform expression of one's self or characters without the need to be perfect or to be 'the best".
 

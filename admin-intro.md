@@ -18,7 +18,7 @@ This has been a section I've been contemplating for a while now, and I'm finally
 So why you might ask a split between the main articles and a publications section?
 
 Simply put, I want a space dedicated for vetted contributors to be able to author their own articles on topics, separate from the general communal articles.
-Sometimes there are topics relating to personal experiences, opinions, or otherwise are intended to be researched publishings from specific authors rather than a general community article.
+Sometimes there are topics relating to personal experiences, opinions, or otherwise are intended to be researched publications from specific authors rather than a general community article.
 
 Some potential examples of topics that might better fit a publications section are:
 
