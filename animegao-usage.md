@@ -20,19 +20,21 @@ On an anecdotal and social basis, the term has largely faded away from usage in 
 
 Anecdotes involving Kigurumi performers are one thing however, lets try to put some numbers to things by those who are most financially invested in the hobby, makers.
 
-## Makers and their usage
+## TLDR
 
-I threw together a quick script to scrape all the makers I'm aware of. In specific their last 20 X posts that were not retweets, X bios, the homepage of their site, and any pages from it up to two clicks deep. 107 makers in total.
+Here's the findings if you dont want to read methodology or the finer details:
+107 makers scanned
+76 mention Kigurumi in some capacity
+Only 6 mention animegao
 
-Totals:
-Only 6 makers out of 107 used the term Animegao. Five of the uses were on websites, with a single maker, GKO, using it on X. In specific GKO has on their bio "A kigurumi mask, animegao studio in Taiwan", and uses #animegao with over a dozen other hashtags on most of their posts. Still, they remain Kigurumi Mask first and foremost in usage.
+Two of the mentions are just to say that western performers sometimes call it animegao
+One maker only uses it to extend SEO and social media reach
+Another maker seemingly uses "animegao kigu" on some pages to target western buyers
+The last two do use the term animegao on one or two pages however at a fraction the use of Kigurumi.
 
-76 makers out of 107 specifically used Kigurumi in English. Of those that had websites 18 had mention of Kigurumi on them. On X 50 had kigurumi in their bio, 57 used #kigurumi and 30 mentioned kigurumi in the body of at least one of their last 20 posts.
+All uses of animegao or kigurumi animegao come secondary to plain old Kigurumi by a sizeable margin.
 
-The rest of the makers did not use either, using only terms in their own language for Kigurumi, this is also due to many makers simply not targeting western markets.
-For example, 54 makers used the Japanese for Kigurumi, 着ぐるみ. On websites 8 instances, on X posts 17 instances and 31 #着ぐるみ uses in the last 20 posts. 27 had it in their X bios.
-
-For those new to Kigurumi who may be asking "why X social media?", the answer is simple. Despite the state of X (formerly Twitter) it is where almost all Makers regardless of region are present and posting. X is the de facto platform for Kigurumi makers and performers. Although many makers will still post on other platforms, such as many Chinese makers posting on Xiaohongshu.
+## Methodology of the scan
 
 <details>
 <summary>Script Details and Output</summary>
@@ -42,1059 +44,25 @@ If Internet Archive environment variables are set, the site will also archive th
 The X.com bio and last 20 posts are scanned for mentions of Animegao and Kigurumi, as well as a maker's website. The website scan is limited to being two clicks deep, and up to 500 pages per site.
 
 <details>
-<summary>Python Script (Long Text)</summary>
-```python
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = [
-#   "httpx>=0.27",
-#   "beautifulsoup4>=4.12",
-#   "lxml>=5.0",
-# ]
-# ///
+<summary>Python Script</summary>
 
-from **future** import annotations
+The scanner is published separately at
+[kamen-kigu/scan-animegao-script](https://github.com/kamen-kigu/scan-animegao-script),
+with the script itself at
+[`scan-animegao.py`](https://github.com/kamen-kigu/scan-animegao-script/blob/main/scan-animegao.py).
 
-import argparse
-import json
-import os
-import re
-import subprocess
-import sys
-import tempfile
-import time
-import warnings
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Literal
-from urllib.parse import quote, urldefrag, urljoin, urlparse
+Run it from the root of a checkout of the Kig.wiki repository (so it can see
+`makers/` and `unused_makers/`):
 
-import httpx
-from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
+```bash
+uv run path/to/scan-animegao.py
+uv run path/to/scan-animegao.py --verbose
+```
 
-warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+It looks for Animegao and Kigurumi (including hashtag-only vs normal usage) on maker
+websites, X bios, and recent X posts. If Internet Archive credentials are set, hit
+pages can also be submitted to the Wayback Machine.
 
-REPO_ROOT = Path(**file**).resolve().parent.parent
-FX_API_BASE = "https://api.fxtwitter.com"
-WAYBACK_SAVE = "https://web.archive.org/save"
-WAYBACK_STATUS = "https://web.archive.org/save/status"
-TweetMentionKind = Literal["general", "hashtag_only"]
-TermName = Literal["animegao", "kigurumi", "着ぐるみ"]
-TERMS: tuple[TermName, ...] = ("animegao", "kigurumi", "着ぐるみ")
-TERM_PHRASE_RE: dict[TermName, re.Pattern[str]] = {
-"animegao": re.compile(r"animegao", re.IGNORECASE),
-"kigurumi": re.compile(r"kigurumi", re.IGNORECASE),
-"着ぐるみ": re.compile(r"着ぐるみ"),
-}
-HASHTAG_TOKEN_RE = re.compile(r"[#＃][^\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\s#＃]+")
-PRIMARY_TERM: TermName = "animegao"
-TARGET_POSTS = 20
-FX_PAGE_SIZE = 20
-FX_MAX_PAGES = 6
-FX_MIN_INTERVAL_S = 1.25
-FX_RETRY_LIMIT = 5
-SITE_TIMEOUT_S = 20.0
-SITE_MIN_INTERVAL_S = 0.4
-SITE_MAX_BYTES = 2_000_000
-SITE_MAX_CHILD_PAGES = 500 # bumped as DAME was hitting the previous limit of 200.
-SITE_MAX_DEPTH = 2
-SITE_RETRY_LIMIT = 3
-
-# Hosts that recently 429'd httpx; prefer curl for the rest of the run.
-
-\_CURL_PREFERRED_HOSTS: set[str] = set()
-ARCHIVE_MIN_INTERVAL_S = 6.0
-ARCHIVE_POLL_INTERVAL_S = 4.0
-ARCHIVE_POLL_ATTEMPTS = 20
-ARCHIVE_IF_NOT_WITHIN = "30d"
-USER_AGENT = (
-"Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-"AppleWebKit/537.36 (KHTML, like Gecko) "
-"Chrome/150.0.0.0 Safari/537.36"
-)
-UNSAFE_LINE_TRANS = str.maketrans({
-"\u2028": "\n",
-"\u2029": "\n",
-"\u0085": "\n",
-})
-SKIP_LINK_SUFFIXES = (
-".jpg",
-".jpeg",
-".png",
-".gif",
-".webp",
-".svg",
-".ico",
-".css",
-".js",
-".mjs",
-".map",
-".pdf",
-".zip",
-".rar",
-".7z",
-".mp4",
-".webm",
-".mp3",
-".wav",
-".woff",
-".woff2",
-".ttf",
-".eot",
-)
-SKIP_LINK_SCHEMES = {"mailto", "tel", "javascript", "data"}
-MARKETPLACE_HOST_MARKERS = (
-"taobao.com",
-"tmall.com",
-"tmall.hk",
-"liangxinyao.com",
-)
-
-@dataclass
-class TweetHit:
-url: str
-text: str
-
-@dataclass
-class SiteHit:
-url: str
-excerpt: str
-archive_url: str | None = None
-term: TermName = "animegao"
-
-@dataclass
-class ScannedPage:
-url: str
-hit_terms: list[TermName] = field(default_factory=list)
-archive_url: str | None = None
-archive_note: str | None = None
-
-    @property
-    def hit(self) -> bool:
-        return bool(self.hit_terms)
-
-@dataclass
-class MakerScan:
-name: str
-region: str
-source: str
-handle: str | None = None
-website: str | None = None
-tweet_hits: dict[TermName, list[TweetHit]] = field(
-default_factory=lambda: {term: [] for term in TERMS}
-)
-tweet_hashtag_hits: dict[TermName, list[TweetHit]] = field(
-default_factory=lambda: {term: [] for term in TERMS}
-)
-bio_hits: dict[TermName, list[TweetHit]] = field(
-default_factory=lambda: {term: [] for term in TERMS}
-)
-site_hits: dict[TermName, list[SiteHit]] = field(
-default_factory=lambda: {term: [] for term in TERMS}
-)
-scanned_tweets: list[TweetHit] = field(default_factory=list)
-scanned_pages: list[ScannedPage] = field(default_factory=list)
-bio_text: str | None = None
-twitter_error: str | None = None
-website_error: str | None = None
-
-    @property
-    def has_animegao_hits(self) -> bool:
-        return bool(
-            self.tweet_hits["animegao"]
-            or self.tweet_hashtag_hits["animegao"]
-            or self.bio_hits["animegao"]
-            or self.site_hits["animegao"]
-        )
-
-class RateLimiter:
-def **init**(self, min_interval_s: float) -> None:
-self.min_interval_s = min_interval_s
-self.\_last = 0.0
-
-    def wait(self) -> None:
-        elapsed = time.monotonic() - self._last
-        remaining = self.min_interval_s - elapsed
-        if remaining > 0:
-            time.sleep(remaining)
-        self._last = time.monotonic()
-
-def clean_text(text: str) -> str:
-return (text or "").translate(UNSAFE_LINE_TRANS)
-
-def wayback_browse_url(url: str) -> str:
-return f"https://web.archive.org/web/*/{url}"
-
-def wayback_capture_url(timestamp: str, url: str) -> str:
-return f"https://web.archive.org/web/{timestamp}/{url}"
-
-def archive_credentials() -> tuple[str, str] | None:
-access = os.environ.get("IA_S3_ACCESS_KEY") or os.environ.get("ARCHIVE_ACCESS_KEY")
-secret = os.environ.get("IA_S3_SECRET_KEY") or os.environ.get("ARCHIVE_SECRET_KEY")
-if access and secret:
-return access, secret
-return None
-
-class WaybackArchiver:
-def **init**(self, client: httpx.Client, limiter: RateLimiter, enabled: bool) -> None:
-self.client = client
-self.limiter = limiter
-self.enabled = enabled
-self.credentials = archive_credentials()
-self.\_cache: dict[str, tuple[str | None, str | None]] = {}
-
-    def resolve(self, url: str, *, save: bool = False) -> tuple[str | None, str | None]:
-        cache_key = f"{int(save)}:{url}"
-        cached = self._cache.get(cache_key)
-        if cached is not None:
-            return cached
-
-        browse = wayback_browse_url(url)
-        if not self.enabled or not save:
-            note = None if self.enabled else "archive save skipped"
-            result = (browse, note)
-            self._cache[cache_key] = result
-            return result
-
-        if self.credentials:
-            saved, note = self._save_authenticated(url)
-            result = (saved or browse, note)
-            self._cache[cache_key] = result
-            return result
-
-        result = (browse, "set IA_S3_ACCESS_KEY/IA_S3_SECRET_KEY to Save Page Now")
-        self._cache[cache_key] = result
-        return result
-
-    def _auth_headers(self) -> dict[str, str]:
-        assert self.credentials is not None
-        access, secret = self.credentials
-        return {
-            "Accept": "application/json",
-            "Authorization": f"LOW {access}:{secret}",
-        }
-
-    def _save_authenticated(self, url: str) -> tuple[str | None, str | None]:
-        self.limiter.wait()
-        try:
-            response = self.client.post(
-                WAYBACK_SAVE,
-                headers=self._auth_headers(),
-                data={
-                    "url": url,
-                    "skip_first_archive": "1",
-                    "js_behavior_timeout": "0",
-                    "if_not_archived_within": ARCHIVE_IF_NOT_WITHIN,
-                },
-                timeout=60.0,
-            )
-        except httpx.HTTPError as exc:
-            return None, f"archive save network error: {exc}"
-
-        if response.status_code == 429:
-            return None, "archive save rate-limited"
-
-        try:
-            body = response.json()
-        except json.JSONDecodeError:
-            return None, f"archive save HTTP {response.status_code}"
-
-        if response.status_code >= 400:
-            return None, body.get("message") or f"archive save HTTP {response.status_code}"
-
-        recent = body.get("relative_url") or body.get("url")
-        timestamp = body.get("timestamp")
-        if timestamp and body.get("original_url"):
-            return wayback_capture_url(str(timestamp), str(body["original_url"])), "reused recent capture"
-
-        job_id = body.get("job_id")
-        if not job_id:
-            if isinstance(recent, str) and recent.startswith("http"):
-                return recent, "archive save accepted"
-            return None, "archive save returned no job id"
-
-        return self._poll_job(str(job_id))
-
-    def _poll_job(self, job_id: str) -> tuple[str | None, str | None]:
-        for _ in range(ARCHIVE_POLL_ATTEMPTS):
-            time.sleep(ARCHIVE_POLL_INTERVAL_S)
-            try:
-                response = self.client.get(
-                    f"{WAYBACK_STATUS}/{quote(job_id, safe='')}",
-                    headers=self._auth_headers(),
-                    timeout=30.0,
-                )
-                body = response.json()
-            except (httpx.HTTPError, json.JSONDecodeError):
-                continue
-
-            status = body.get("status")
-            if status == "success":
-                timestamp = body.get("timestamp")
-                original = body.get("original_url")
-                if timestamp and original:
-                    return wayback_capture_url(str(timestamp), str(original)), "archived"
-                return None, "archive succeeded without timestamp"
-            if status == "error":
-                return None, body.get("message") or body.get("status_ext") or "archive error"
-        return None, "archive save still pending"
-
-def load_makers(paths: list[Path]) -> list[tuple[Path, dict[str, Any]]]:
-makers: list[tuple[Path, dict[str, Any]]] = []
-for directory in paths:
-if not directory.is_dir():
-continue
-for path in sorted(directory.glob("\*.json")):
-makers.append((path, json.loads(path.read_text(encoding="utf-8"))))
-return makers
-
-def extract_handle(socials: dict[str, Any] | None) -> str | None:
-if not socials:
-return None
-raw = socials.get("x") or socials.get("twitter")
-if not raw or not isinstance(raw, str):
-return None
-parsed = urlparse(raw.strip())
-path = parsed.path.strip("/")
-if not path:
-return None
-handle = path.split("/")[0].lstrip("@")
-return handle or None
-
-def phrase_matches(text: str, term: TermName = PRIMARY_TERM) -> bool:
-return bool(TERM_PHRASE_RE[term].search(text or ""))
-
-def classify_tweet_mention(text: str, term: TermName) -> TweetMentionKind | None:
-if not phrase_matches(text, term):
-return None
-without_hashtags = HASHTAG_TOKEN_RE.sub(" ", text)
-if phrase_matches(without_hashtags, term):
-return "general"
-return "hashtag_only"
-
-def classify_all_tweet_mentions(text: str) -> dict[TermName, TweetMentionKind]:
-found: dict[TermName, TweetMentionKind] = {}
-for term in TERMS:
-kind = classify_tweet_mention(text, term)
-if kind is not None:
-found[term] = kind
-return found
-
-def matching_terms(text: str) -> list[TermName]:
-return [term for term in TERMS if phrase_matches(text, term)]
-
-def host_of(url: str) -> str:
-host = urlparse(url if "://" in url else f"https://{url}").netloc.casefold()
-return host.removeprefix("www.")
-
-def is_marketplace_url(url: str) -> bool:
-host = host_of(url)
-return any(host == marker or host.endswith("." + marker) for marker in MARKETPLACE_HOST_MARKERS)
-
-def excerpt_around(text: str, term: TermName, radius: int = 80) -> str:
-match = TERM_PHRASE_RE[term].search(text)
-if not match:
-return ""
-start = max(0, match.start() - radius)
-end = min(len(text), match.end() + radius)
-chunk = text[start:end].replace("\n", " ").strip()
-if start > 0:
-chunk = "…" + chunk
-if end < len(text):
-chunk = chunk + "…"
-return chunk
-
-def is_own_post(status: dict[str, Any], handle: str) -> bool:
-if status.get("reposted_by") is not None:
-return False
-author = (status.get("author") or {}).get("screen_name") or ""
-return author.casefold() == handle.casefold()
-
-def fetch_fx_profile(
-client: httpx.Client,
-limiter: RateLimiter,
-handle: str,
-) -> tuple[dict[str, Any] | None, str | None]:
-for attempt in range(FX_RETRY_LIMIT):
-limiter.wait()
-try:
-response = client.get(f"{FX_API_BASE}/{handle}")
-except httpx.HTTPError as exc:
-return None, f"network error: {exc}"
-
-        if response.status_code == 429:
-            retry_after = response.headers.get("Retry-After")
-            delay = float(retry_after) if retry_after and retry_after.isdigit() else min(
-                30.0, FX_MIN_INTERVAL_S * (2**attempt)
-            )
-            time.sleep(delay)
-            continue
-
-        if response.status_code == 404:
-            return None, "profile not found"
-
-        if response.status_code >= 500:
-            time.sleep(min(20.0, FX_MIN_INTERVAL_S * (2**attempt)))
-            continue
-
-        try:
-            body = response.json()
-        except json.JSONDecodeError:
-            return None, f"invalid JSON (HTTP {response.status_code})"
-
-        if response.status_code != 200 or body.get("code") != 200:
-            return None, body.get("message") or f"HTTP {response.status_code}"
-
-        user = body.get("user")
-        if not isinstance(user, dict):
-            return None, "profile missing user object"
-        return user, None
-
-    return None, "rate limited by FxTwitter after retries"
-
-def fetch_fx_statuses(
-client: httpx.Client,
-limiter: RateLimiter,
-handle: str,
-) -> tuple[list[dict[str, Any]], str | None]:
-collected: list[dict[str, Any]] = []
-cursor: str | None = None
-seen_ids: set[str] = set()
-error: str | None = None
-
-    for _ in range(FX_MAX_PAGES):
-        if len(collected) >= TARGET_POSTS:
-            break
-
-        params: dict[str, str | int] = {"count": FX_PAGE_SIZE}
-        if cursor:
-            params["cursor"] = cursor
-
-        body: dict[str, Any] | None = None
-        for attempt in range(FX_RETRY_LIMIT):
-            limiter.wait()
-            try:
-                response = client.get(
-                    f"{FX_API_BASE}/2/profile/{handle}/statuses",
-                    params=params,
-                )
-            except httpx.HTTPError as exc:
-                error = f"network error: {exc}"
-                return collected, error
-
-            if response.status_code == 429:
-                retry_after = response.headers.get("Retry-After")
-                delay = float(retry_after) if retry_after and retry_after.isdigit() else min(
-                    30.0, FX_MIN_INTERVAL_S * (2**attempt)
-                )
-                time.sleep(delay)
-                continue
-
-            if response.status_code == 404:
-                return collected, "profile not found or empty timeline"
-
-            if response.status_code >= 500:
-                time.sleep(min(20.0, FX_MIN_INTERVAL_S * (2**attempt)))
-                continue
-
-            try:
-                body = response.json()
-            except json.JSONDecodeError:
-                error = f"invalid JSON (HTTP {response.status_code})"
-                return collected, error
-
-            if response.status_code != 200 or body.get("code") != 200:
-                error = body.get("message") or f"HTTP {response.status_code}"
-                return collected, error
-            break
-        else:
-            return collected, "rate limited by FxTwitter after retries"
-
-        assert body is not None
-        results = body.get("results") or []
-        if not results:
-            break
-
-        for status in results:
-            if status.get("type") not in (None, "status"):
-                continue
-            status_id = str(status.get("id") or "")
-            if not status_id or status_id in seen_ids:
-                continue
-            if not is_own_post(status, handle):
-                continue
-            seen_ids.add(status_id)
-            collected.append(status)
-            if len(collected) >= TARGET_POSTS:
-                break
-
-        cursor = (body.get("cursor") or {}).get("bottom")
-        if not cursor:
-            break
-
-    return collected[:TARGET_POSTS], error
-
-def html_to_text(html: str) -> str:
-soup = BeautifulSoup(html, "lxml")
-for tag in soup(["script", "style", "noscript", "svg", "template"]):
-tag.decompose()
-text = soup.get_text("\n", strip=True)
-return re.sub(r"\n{3,}", "\n\n", text)
-
-def same_site(base: str, candidate: str) -> bool:
-base_host = urlparse(base).netloc.casefold().removeprefix("www.")
-cand_host = urlparse(candidate).netloc.casefold().removeprefix("www.")
-return bool(base_host) and base_host == cand_host
-
-def normalize*page_url(url: str) -> str:
-cleaned, * = urldefrag(url)
-parsed = urlparse(cleaned)
-path = parsed.path or "/"
-if path != "/" and path.endswith("/"):
-path = path.rstrip("/")
-return parsed.\_replace(fragment="", path=path, query=parsed.query).geturl()
-
-def should_skip_url(url: str) -> bool:
-parsed = urlparse(url)
-if parsed.scheme.casefold() in SKIP_LINK_SCHEMES:
-return True
-if parsed.scheme not in ("http", "https"):
-return True
-if is_marketplace_url(url):
-return True
-path = parsed.path.casefold()
-return any(path.endswith(suffix) for suffix in SKIP_LINK_SUFFIXES)
-
-def extract_same_site_links(page_url: str, html: str) -> list[str]:
-soup = BeautifulSoup(html, "lxml")
-found: list[str] = []
-seen: set[str] = set()
-for anchor in soup.find_all("a", href=True):
-href = anchor.get("href")
-if not href or not isinstance(href, str):
-continue
-absolute = urljoin(page_url, href.strip())
-if should_skip_url(absolute) or not same_site(page_url, absolute):
-continue
-normalized = normalize_page_url(absolute)
-if normalized in seen or normalized == normalize_page_url(page_url):
-continue
-seen.add(normalized)
-found.append(normalized)
-return found
-
-def fetch_page_via_curl(url: str) -> tuple[str | None, str | None, str | None]:
-with tempfile.NamedTemporaryFile(prefix="kigwiki-scan-", suffix=".html", delete=False) as tmp:
-out_path = Path(tmp.name)
-try:
-completed = subprocess.run(
-[
-"curl",
-"-sS",
-"-L",
-"--compressed",
-"-A",
-USER_AGENT,
-"-H",
-"Accept: text/html,application/xhtml+xml;q=0.9,*/*;q=0.8",
-"--max-time",
-str(int(SITE_TIMEOUT_S)),
-"--max-filesize",
-str(SITE_MAX_BYTES),
-"-o",
-str(out_path),
-"-w",
-"%{http_code}\n%{url_effective}",
-url,
-],
-capture_output=True,
-text=True,
-check=False,
-)
-if completed.returncode not in (0, 28, 63):
-detail = (completed.stderr or completed.stdout or "").strip()
-return None, None, f"curl failed ({completed.returncode}): {detail or 'unknown error'}"
-meta = (completed.stdout or "").strip().splitlines()
-if len(meta) < 2:
-return None, None, "curl missing status metadata"
-status_s, final_url = meta[0].strip(), meta[1].strip()
-try:
-status = int(status_s)
-except ValueError:
-return None, None, f"curl bad status: {status_s}"
-if status in (429, 503):
-return None, None, f"HTTP {status}"
-if status >= 400:
-return None, None, f"HTTP {status}"
-raw = out_path.read_bytes()
-if len(raw) > SITE_MAX_BYTES:
-return None, None, "response too large"
-if not raw:
-return None, None, "empty response"
-html = raw.decode("utf-8", errors="replace")
-return final_url or url, html, None
-except OSError as exc:
-return None, None, f"curl unavailable: {exc}"
-finally:
-out_path.unlink(missing_ok=True)
-
-def fetch_page(
-client: httpx.Client,
-limiter: RateLimiter,
-url: str,
-) -> tuple[str | None, str | None, str | None]:
-host = host_of(url)
-if host in \_CURL_PREFERRED_HOSTS:
-limiter.wait()
-return fetch_page_via_curl(url)
-
-    last_error: str | None = None
-    saw_rate_limit = False
-    for attempt in range(SITE_RETRY_LIMIT):
-        limiter.wait()
-        try:
-            with client.stream("GET", url, follow_redirects=True) as response:
-                status = response.status_code
-                if status in (429, 503):
-                    saw_rate_limit = True
-                    retry_after = response.headers.get("Retry-After")
-                    if retry_after and retry_after.isdigit():
-                        delay = float(retry_after)
-                    else:
-                        delay = min(30.0, SITE_MIN_INTERVAL_S * (2 ** (attempt + 3)))
-                    last_error = f"HTTP {status}"
-                    response.read()
-                    time.sleep(delay)
-                    continue
-                content_type = (response.headers.get("content-type") or "").casefold()
-                if status >= 400:
-                    return None, None, f"HTTP {status}"
-                if "text/html" not in content_type and "application/xhtml" not in content_type:
-                    if content_type and not content_type.startswith("text/"):
-                        return None, None, f"skipped non-HTML ({content_type.split(';')[0]})"
-                chunks: list[bytes] = []
-                total = 0
-                for chunk in response.iter_bytes():
-                    total += len(chunk)
-                    if total > SITE_MAX_BYTES:
-                        return None, None, "response too large"
-                    chunks.append(chunk)
-                raw = b"".join(chunks)
-                encoding = response.charset_encoding or "utf-8"
-                html = raw.decode(encoding, errors="replace")
-                return str(response.url), html, None
-        except httpx.HTTPError as exc:
-            last_error = f"network error: {exc}"
-            time.sleep(min(20.0, SITE_MIN_INTERVAL_S * (2**attempt)))
-
-    if saw_rate_limit:
-        _CURL_PREFERRED_HOSTS.add(host)
-        limiter.wait()
-        curl_url, curl_html, curl_error = fetch_page_via_curl(url)
-        if curl_html is not None:
-            return curl_url, curl_html, None
-        if curl_error:
-            last_error = f"{last_error}; curl fallback: {curl_error}"
-
-    return None, None, last_error or "request failed after retries"
-
-def scan_website(
-client: httpx.Client,
-limiter: RateLimiter,
-website: str,
-archiver: WaybackArchiver,
-archive_all: bool,
-) -> tuple[dict[TermName, list[SiteHit]], list[ScannedPage], str | None]:
-root = website if "://" in website else f"https://{website}"
-final_url, html, error = fetch_page(client, limiter, root)
-if error or not html or not final_url:
-return {term: [] for term in TERMS}, [], error or "empty response"
-
-    fetched: list[tuple[str, str]] = [(final_url, html_to_text(html))]
-    seen: set[str] = {normalize_page_url(final_url)}
-    frontier: list[tuple[str, str]] = [(final_url, html)]
-    child_budget = SITE_MAX_CHILD_PAGES
-
-    for depth in range(1, SITE_MAX_DEPTH + 1):
-        if child_budget <= 0:
-            break
-        next_frontier: list[tuple[str, str]] = []
-        candidates: list[str] = []
-        for page_url, page_html in frontier:
-            for link in extract_same_site_links(page_url, page_html):
-                if link in seen:
-                    continue
-                seen.add(link)
-                candidates.append(link)
-                if len(candidates) >= child_budget:
-                    break
-            if len(candidates) >= child_budget:
-                break
-
-        for child in candidates:
-            child_final, child_html, child_error = fetch_page(client, limiter, child)
-            child_budget -= 1
-            if child_error or not child_html or not child_final:
-                continue
-            fetched.append((child_final, html_to_text(child_html)))
-            if depth < SITE_MAX_DEPTH:
-                next_frontier.append((child_final, child_html))
-        frontier = next_frontier
-
-    hits: dict[TermName, list[SiteHit]] = {term: [] for term in TERMS}
-    pages: list[ScannedPage] = []
-    for url, text in fetched:
-        terms = matching_terms(text)
-        should_save = PRIMARY_TERM in terms or archive_all
-        archive_url, archive_note = archiver.resolve(url, save=should_save)
-        pages.append(
-            ScannedPage(
-                url=url,
-                hit_terms=terms,
-                archive_url=archive_url,
-                archive_note=archive_note,
-            )
-        )
-        for term in terms:
-            hits[term].append(
-                SiteHit(
-                    url=url,
-                    excerpt=clean_text(excerpt_around(text, term)),
-                    archive_url=archive_url,
-                    term=term,
-                )
-            )
-    return hits, pages, None
-
-def scan_maker(
-path: Path,
-data: dict[str, Any],
-fx_client: httpx.Client,
-web_client: httpx.Client,
-fx_limiter: RateLimiter,
-web_limiter: RateLimiter,
-archiver: WaybackArchiver,
-archive_all: bool,
-) -> MakerScan:
-source = "makers" if path.parent.name == "makers" else path.parent.name
-website = data.get("website") if isinstance(data.get("website"), str) else None
-if website and is_marketplace_url(website):
-website = None
-
-    result = MakerScan(
-        name=str(data.get("name") or path.stem),
-        region=str(data.get("Region") or data.get("region") or "unknown"),
-        source=source,
-        handle=extract_handle(data.get("socials")),
-        website=website,
-    )
-
-    if result.handle:
-        profile, profile_error = fetch_fx_profile(fx_client, fx_limiter, result.handle)
-        if profile_error and not result.twitter_error:
-            result.twitter_error = profile_error
-        if profile:
-            bio = clean_text(str(profile.get("description") or ""))
-            result.bio_text = bio
-            if bio:
-                profile_url = str(profile.get("url") or f"https://x.com/{result.handle}")
-                entry = TweetHit(url=profile_url, text=bio)
-                for term in classify_all_tweet_mentions(bio):
-                    result.bio_hits[term].append(entry)
-
-        statuses, error = fetch_fx_statuses(fx_client, fx_limiter, result.handle)
-        result.twitter_error = error or result.twitter_error
-        for status in statuses:
-            text = clean_text(str(status.get("text") or ""))
-            url = str(status.get("url") or f"https://x.com/{result.handle}/status/{status.get('id')}")
-            entry = TweetHit(url=url, text=text)
-            result.scanned_tweets.append(entry)
-            for term, kind in classify_all_tweet_mentions(text).items():
-                if kind == "general":
-                    result.tweet_hits[term].append(entry)
-                else:
-                    result.tweet_hashtag_hits[term].append(entry)
-
-    if result.website:
-        hits, pages, error = scan_website(
-            web_client, web_limiter, result.website, archiver, archive_all
-        )
-        result.website_error = error
-        result.site_hits = hits
-        result.scanned_pages = pages
-
-    return result
-
-def format_site_hit_line(term: TermName, index: int, hit: SiteHit) -> str:
-line = f"site {term} references {index} : {hit.url}"
-if hit.archive_url:
-line += f" | archive: {hit.archive_url}"
-return line
-
-def format_url_list(label: str, hits: list[TweetHit]) -> str:
-if not hits:
-return f"{label}: none (0)"
-urls = ", ".join(hit.url for hit in hits)
-return f"{label} ({len(hits)}): {urls}"
-
-def format_compact(results: list[MakerScan]) -> str:
-lines: list[str] = []
-zero_animegao: list[str] = []
-
-    for scan in results:
-        has_any = any(
-            scan.site_hits[term]
-            or scan.tweet_hits[term]
-            or scan.tweet_hashtag_hits[term]
-            or scan.bio_hits[term]
-            for term in TERMS
-        )
-        if not scan.has_animegao_hits:
-            zero_animegao.append(scan.name)
-        if not has_any:
-            continue
-
-        lines.append(f"maker: {scan.name}")
-        lines.append(f"region: {scan.region}")
-        if scan.website_error:
-            lines.append(f"website note: {scan.website_error}")
-        if scan.twitter_error:
-            lines.append(f"twitter note: {scan.twitter_error}")
-        for term in TERMS:
-            site_hits = scan.site_hits[term]
-            if site_hits:
-                for index, hit in enumerate(site_hits, start=1):
-                    lines.append(format_site_hit_line(term, index, hit))
-            else:
-                lines.append(f"site {term} references: none (0)")
-            lines.append(
-                format_url_list(
-                    f"x.com {term} references",
-                    scan.tweet_hits[term],
-                )
-            )
-            lines.append(
-                format_url_list(
-                    f"x.com {term} hashtag-only references",
-                    scan.tweet_hashtag_hits[term],
-                )
-            )
-            lines.append(
-                format_url_list(
-                    f"x.com {term} bio references",
-                    scan.bio_hits[term],
-                )
-            )
-        lines.append("")
-
-    lines.append("makers with zero animegao reference:")
-    lines.append(" ".join(zero_animegao) if zero_animegao else "(none)")
-    lines.append("")
-    lines.append(_format_totals(results))
-    return "\n".join(lines).rstrip() + "\n"
-
-def \_format_totals(results: list[MakerScan]) -> str:
-lines = ["totals:"]
-for term in TERMS:
-site_makers = sum(1 for scan in results if scan.site_hits[term])
-general_makers = sum(1 for scan in results if scan.tweet_hits[term])
-hashtag_makers = sum(1 for scan in results if scan.tweet_hashtag_hits[term])
-bio_makers = sum(1 for scan in results if scan.bio_hits[term])
-any_makers = sum(
-1
-for scan in results
-if (
-scan.site_hits[term]
-or scan.tweet_hits[term]
-or scan.tweet_hashtag_hits[term]
-or scan.bio_hits[term]
-)
-)
-lines.append(
-f" {term}: {any_makers} makers | "
-f"site {site_makers} | x.com general {general_makers} | "
-f"x.com hashtag-only {hashtag_makers} | x.com bio {bio_makers}"
-)
-return "\n".join(lines)
-
-def tweet_marker(text: str) -> str:
-kinds = classify_all_tweet_mentions(text)
-if not kinds:
-return "ok"
-parts: list[str] = []
-for term in TERMS:
-kind = kinds.get(term)
-if kind == "general":
-parts.append(term)
-elif kind == "hashtag_only":
-parts.append(f"{term}#")
-return "HIT " + ",".join(parts)
-
-def format_verbose(results: list[MakerScan]) -> str:
-lines: list[str] = []
-
-    for scan in results:
-        lines.append("=" * 72)
-        lines.append(f"maker: {scan.name}")
-        lines.append(f"region: {scan.region}")
-        lines.append(f"source: {scan.source}")
-        lines.append(f"handle: {scan.handle or '(none)'}")
-        lines.append(f"website: {scan.website or '(none)'}")
-        if scan.twitter_error:
-            lines.append(f"twitter note: {scan.twitter_error}")
-        if scan.website_error:
-            lines.append(f"website note: {scan.website_error}")
-        lines.append("")
-
-        lines.append("--- scanned x.com bio ---")
-        if scan.bio_text is None:
-            lines.append("(none)")
-        else:
-            bio_kinds = classify_all_tweet_mentions(scan.bio_text)
-            if bio_kinds:
-                marker = "HIT " + ",".join(bio_kinds)
-            else:
-                marker = "ok"
-            lines.append(f"[{marker}] https://x.com/{scan.handle}" if scan.handle else f"[{marker}]")
-            lines.append(scan.bio_text or "(empty)")
-        lines.append("")
-
-        lines.append(f"--- scanned tweets ({len(scan.scanned_tweets)}) ---")
-        if not scan.scanned_tweets:
-            lines.append("(none)")
-        for tweet in scan.scanned_tweets:
-            lines.append(f"[{tweet_marker(tweet.text)}] {tweet.url}")
-            lines.append(clean_text(tweet.text) or "(empty)")
-            lines.append("")
-
-        lines.append(f"--- scanned website pages ({len(scan.scanned_pages)}) ---")
-        if not scan.scanned_pages:
-            lines.append("(none)")
-        for page in scan.scanned_pages:
-            if page.hit_terms:
-                marker = "HIT " + ",".join(page.hit_terms)
-            else:
-                marker = "ok"
-            lines.append(f"[{marker}] {page.url}")
-            if page.archive_url:
-                lines.append(f"archive: {page.archive_url}")
-            if page.archive_note:
-                lines.append(f"archive note: {page.archive_note}")
-            lines.append("")
-
-    lines.append("=" * 72)
-    lines.append("RESULTS")
-    lines.append("=" * 72)
-    lines.append(format_compact(results).rstrip())
-    return "\n".join(lines).rstrip() + "\n"
-
-def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-parser = argparse.ArgumentParser(
-description=(
-"Scan makers and unused_makers for 'animegao', 'kigurumi', and '着ぐるみ' "
-"mentions on FxTwitter timelines and maker websites. Website "
-"bodies are not dumped; pages are linked to the Wayback Machine instead."
-)
-)
-parser.add_argument(
-"-v",
-"--verbose",
-action="store_true",
-help="Print scanned tweet texts and website URLs/archive links, then the summary",
-)
-parser.add_argument(
-"--makers-dir",
-type=Path,
-default=REPO_ROOT / "makers",
-help="Directory of published maker JSON files",
-)
-parser.add_argument(
-"--unused-dir",
-type=Path,
-default=REPO_ROOT / "unused_makers",
-help="Directory of unused maker JSON files",
-)
-parser.add_argument(
-"--limit",
-type=int,
-default=0,
-help="Only scan the first N makers (0 = all); useful for smoke tests",
-)
-parser.add_argument(
-"--no-archive",
-action="store_true",
-help="Skip Wayback Save Page Now attempts; still emit web/\*/ browse links",
-)
-parser.add_argument(
-"--archive-all",
-action="store_true",
-help="Save Page Now every scanned website page (default: only animegao hits)",
-)
-return parser.parse_args(argv)
-
-def main(argv: list[str] | None = None) -> int:
-args = parse_args(argv)
-makers = load_makers([args.makers_dir, args.unused_dir])
-if args.limit > 0:
-makers = makers[: args.limit]
-
-    if not makers:
-        print("No maker JSON files found.", file=sys.stderr)
-        return 1
-
-    fx_limiter = RateLimiter(FX_MIN_INTERVAL_S)
-    web_limiter = RateLimiter(SITE_MIN_INTERVAL_S)
-    archive_limiter = RateLimiter(ARCHIVE_MIN_INTERVAL_S)
-    headers = {"User-Agent": USER_AGENT, "Accept": "application/json, text/html, */*"}
-
-    results: list[MakerScan] = []
-    with (
-        httpx.Client(headers=headers, timeout=30.0) as fx_client,
-        httpx.Client(
-            headers={**headers, "Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8"},
-            timeout=SITE_TIMEOUT_S,
-            follow_redirects=True,
-        ) as web_client,
-        httpx.Client(headers=headers, timeout=60.0, follow_redirects=True) as archive_client,
-    ):
-        archiver = WaybackArchiver(
-            archive_client,
-            archive_limiter,
-            enabled=not args.no_archive,
-        )
-        if archiver.enabled and not archiver.credentials:
-            print(
-                "No IA_S3_ACCESS_KEY/IA_S3_SECRET_KEY set; "
-                "logging Wayback browse links only (no Save Page Now).",
-                file=sys.stderr,
-            )
-
-        total = len(makers)
-        for index, (path, data) in enumerate(makers, start=1):
-            name = data.get("name") or path.stem
-            print(f"[{index}/{total}] scanning {name}…", file=sys.stderr)
-            results.append(
-                scan_maker(
-                    path,
-                    data,
-                    fx_client,
-                    web_client,
-                    fx_limiter,
-                    web_limiter,
-                    archiver,
-                    archive_all=args.archive_all,
-                )
-            )
-
-    output = format_verbose(results) if args.verbose else format_compact(results)
-    sys.stdout.write(output)
-    return 0
-
-if **name** == "**main**":
-raise SystemExit(main())
-
-````
 </details>
 
 <details>
@@ -3270,65 +2238,97 @@ totals:
   animegao: 6 makers | site 5 | x.com general 0 | x.com hashtag-only 1 | x.com bio 1
   kigurumi: 76 makers | site 18 | x.com general 30 | x.com hashtag-only 57 | x.com bio 50
   着ぐるみ: 54 makers | site 8 | x.com general 17 | x.com hashtag-only 31 | x.com bio 27
-````
+```
 
 </details>
 </details>
 
-### A deeper dive into the output
+## Makers and their usage
 
-Lets go maker by maker through those who used the term Animegao and inspect their usage.
+Totals:
+
+Only 6 makers out of 107 used the term Animegao. Five of those uses were on websites, with a single maker, GKO, using it on X. In specific GKO has on their bio "A kigurumi mask, animegao studio in Taiwan", and uses #animegao with over a dozen other hashtags on most of their posts. Still, they remain Kigurumi Mask first and foremost in usage.
+
+76 makers out of 107 specifically used Kigurumi in English. Of those that had websites, 18 mentioned Kigurumi on them. On X, 50 had kigurumi in their bio, 57 used #kigurumi, and 30 mentioned kigurumi in the body of at least one of their last 20 posts.
+
+The rest of the makers did not use either, using only terms in their own language for Kigurumi. This is also due to many makers simply not targeting western markets.
+
+For example, 54 makers used the Japanese for Kigurumi, 着ぐるみ. On websites: 8 instances. On X: 17 instances in posts, 31 #着ぐるみ uses in the last 20 posts, and 27 had it in their X bios.
+
+For those new to Kigurumi who may be asking "why X social media?", the answer is simple. Despite the state of X (formerly Twitter) it is where almost all makers, regardless of region, are present and posting. X is the de facto platform for Kigurumi makers and performers. Although many makers will still post on other platforms, such as many Chinese makers posting on Xiaohongshu.
+
+### Those that used Animegao
+
+Lets go through maker by maker to see those who used the term Animegao and inspect their usage. Each section covers website usage, then X, then a short takeaway.
 
 #### Black Cat Kig
 
-The first maker is Black Cat Kig from Mainland China. Indeed on and only on their [gallery](https://blackcatkig.com/pages/gallery) page they do mention "Animegao Kigurumi", once. Comparatively they use Kigumi on at least 159 other pages ranging from the homepage, to example masks, the ordering process, and general guides.
+Located in Mainland China Region.
 
-Their last 20 X posts do not mention the term Animegao at all, meanwhile 8 posts include general usage of the term Kigurumi and 11 feature #kigurumi. Two posts feature #着ぐるみ.
+**Website:** On and only on their [gallery](https://blackcatkig.com/pages/gallery) page they mention "Animegao Kigurumi", once. Comparatively they use Kigurumi on at least 159 other pages, ranging from the homepage, to example masks, the ordering process, and general guides.
+
+**X (last 20 posts):** No mentions of Animegao. 8 posts include general usage of Kigurumi, 11 feature #kigurumi, and 2 feature #着ぐるみ.
+
+**Takeaway:** One gallery mention against heavy Kigurumi usage everywhere else. Not really in their vocabulary.
 
 #### Goukaou (GKO)
 
-GKO is a maker from the region of Taiwan. The scan of their website did not find any mentions of the term Aniemgao, but did find multiple references to Kigurumi.
+Located in Taiwan Region.
 
-On their last 20 X posts they included both #Kigurumi and #Animegao in the last 10 posts, avoiding usage of either term in the body of the post itself. This is alongside a number of other related hashtags including #着ぐるみ, for example:
-#kig #kiger #着ぐるみ #Kigurumi #面具 #マスク #キグルミ #GKO #goukaou #GKO_Kigurumi_Studio #コスプレ #cosplay #costume #美少女着ぐるみ #animegao #animegaokigurumi #kigurumimask
+**Website:** No mentions of Animegao. Multiple references to Kigurumi.
+
+**X (last 20 posts):** Both #Kigurumi and #Animegao show up in 10 posts, largely avoiding either term in the body of the post itself. This is alongside a number of other related hashtags including #着ぐるみ, for example:
+`#kig #kiger #着ぐるみ #Kigurumi #面具 #マスク #キグルミ #GKO #goukaou #GKO_Kigurumi_Studio #コスプレ #cosplay #costume #美少女着ぐるみ #animegao #animegaokigurumi #kigurumimask`
 
 Truly an example of "spray and pray" as it comes to hashtag usage, trying to cover every base possible and maximize reach.
 
-Their bio on X also mentions "A kigurumi mask, animegao studio in Taiwan", noting however a primary focus on "kigurumi mask" over "animegao", again focusing primarily on covering bases. The Japanese part of their bio is essentially similar but saying "anime character design" in place of animegao.
+**Bio:** "A kigurumi mask, animegao studio in Taiwan". Primary focus is still on "kigurumi mask" over "animegao". The Japanese part of their bio is essentially similar but says "anime character design" in place of animegao.
+
+**Takeaway:** The only maker with real social media Animegao usage, and even then it is almost entirely hashtag padding. Kigurumi Mask usage remains first and foremost.
 
 #### MidDream Kigu (Formerly Kig Lover)
 
-MidDream Kigu is a relatively newer maker from Mainland China. Unlike most other Chinese maker entities this is one specifically trying to target western buyers.
+Located in Mainland China Region.
+Relatively newer maker, and unlike most other Mainland Chinese maker entities, this is one specifically trying to target western buyers.
 
-Their site indeed does mention the term Animegao Kigu across 16 pages, still being dwarfed by the 23 uses of kigurumi in general across their pages.
-On their last 20 X posts they did not use animegao in any context, but did use Kigurumi in general once and #kigurumi in 7 posts.
+**Website:** Mentions "Animegao Kigu" across 16 pages, still dwarfed by 23 uses of kigurumi in general across their pages.
 
-I would prescribe their usage primarily trying to cover terms they believe western buyers may be searching for, although I do find it curious they use the term "animegao kigu" rather than "animegao kigurumi", but that is neither here nor there.
+**X (last 20 posts):** No animegao in any context. Kigurumi in general is mentioned once, #kigurumi in 7 posts.
+
+**Takeaway:** I would prescribe their usage as primarily trying to cover terms they believe western buyers may be searching for. Curiously they use "animegao kigu" rather than "animegao kigurumi", but that is neither here nor there.
 
 #### DAME
 
-DAME is a UK based Kigurumi maker. On their homepage they do mention "animegao kigurumi" after previously describing themselves as a "new kigurumi enterprise". This page exists is duplicated across both on https://damekigurumi.com/ and https://damekigurumi.com/home . Other than that the only other found reference to animegao is an embedded X post on https://damekigurumi.com/Blog/What-Happened-in-2021 from now deleted X account @StephanieNeckk .
-Zero references to the term Animegao in their last 20 X posts. One use of Kigurumi in the body of a post, they also use kigurumi in their X bio, and not animegao.
+Located in the UK.
 
-As we can see, even among western makers, the term Animegao is largely absent from usage.
+**Website:** On their homepage they mention "animegao kigurumi" after previously describing themselves as a "new kigurumi enterprise". That page is duplicated across both https://damekigurumi.com/ and https://damekigurumi.com/home. Other than that, the only other found reference to animegao is an embedded X post on https://damekigurumi.com/Blog/What-Happened-in-2021 from the now deleted X account @StephanieNeckk.
+
+**X (last 20 posts):** Zero references to Animegao. One use of Kigurumi in the body of a post. Their X bio uses kigurumi, not animegao.
+
+**Takeaway:** Even among western makers, Animegao is largely absent from usage.
 
 #### MEIS/Pinhaotou
 
-Another mainland Chinese maker with a Japanese presence on X.
-There is one usage of the term Animegao on their main page, on a Kigurumi mask primer page https://www.kigis.me/kigurumi where they mention Animegao being used in western contexts and how it started being used around 2005, basically after the initial edit of wikipedia to include the term was done.
-Comparatively they use Kigurumi on 14 other pages.
+Located in Mainland China Region, with a Japanese presence on X.
 
-Across their last 20 X posts they did not use animegao in any context, but did use #kigurumi in 1 post. Their bio on X mentions Kigurumi and 着ぐるみ, not animegao.
+**Website:** One usage of Animegao on their main Kigurumi mask primer page, https://www.kigis.me/kigurumi, where they mention Animegao being used in western contexts and how it started being used around 2005, basically after the initial edit of wikipedia to include the term was done. Comparatively they use Kigurumi on 14 other pages.
+
+**X (last 20 posts):** No animegao in any context. #kigurumi in 1 post. Bio mentions Kigurumi and 着ぐるみ, not animegao.
+
+**Takeaway:** Mentions Animegao only to explain it as a western term. Actual branding stays on Kigurumi / 着ぐるみ.
 
 #### Munimuni Works
 
-Munimuni is a Japanese maker, there is a single reference detected on their website. Notably this reference https://www.munimuni.jp/p/00015 essentially points out that in Japan what they call Kigurumi Masks, or Bishoujo Kigurumi, are in the west called Kigurumi, Animegao, "etc".
+Located in Japan.
 
-They do however use Kigurumi in english across four of their pages, with zero usage of either english phrasing in their last 20 X posts.
-Their X bio does not have any explicit mention of Kigurumi, 着ぐるみ or animegao.
+**Website:** A single reference detected. Notably https://www.munimuni.jp/p/00015 essentially points out that in Japan what they call Kigurumi Masks, or Bishoujo Kigurumi, are in the west called Kigurumi, Animegao, "etc". They do however use Kigurumi in English across four of their pages.
+
+**X (last 20 posts):** Zero usage of either English phrasing. Bio has no explicit mention of Kigurumi, 着ぐるみ, or animegao.
+
+**Takeaway:** Same pattern as MEIS. Animegao shows up only as "this is what the west calls it", not generally in their marketing.
 
 ### Summary
 
-Going through the results you can find that almost all usage is just mentioning that the term Animegao exists as a western term or for trying to capture SEO. Notably makers almost exclusively will use the term Kigurumi or Kigurumi Mask when discussing the hobby in English.
+Going through the results, almost all usage is just mentioning that the term Animegao exists as a western term, or trying to capture SEO. Notably makers almost exclusively will use Kigurumi or Kigurumi Mask when discussing the hobby in English.
 
-The only real usage on social media from makers is by studio GKO who tends to include over a dozen hashtags in each post to maximize reach, a practice which anecdotally I find reflects most remaining usage by performers online, existing as just another hashtag to throw in the wind.
+The only real usage on social media from makers is by GKO, who tends to include over a dozen hashtags in each post to maximize reach. Anecdotally that reflects most remaining usage by performers online too, existing as just another hashtag to throw in the wind.
