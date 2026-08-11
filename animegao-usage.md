@@ -2332,3 +2332,18 @@ Located in Japan.
 Going through the results, almost all usage is just mentioning that the term Animegao exists as a western term, or trying to capture SEO. Notably makers almost exclusively will use Kigurumi or Kigurumi Mask when discussing the hobby in English.
 
 The only real usage on social media from makers is by GKO, who tends to include over a dozen hashtags in each post to maximize reach. Anecdotally that reflects most remaining usage by performers online too, existing as just another hashtag to throw in the wind.
+
+## Kigurumi vs Kigurumi Mask - August 11th Addendum
+
+This addendum comes two days after the initial posting of this publication, and is a follow up to the initial scan.
+The script was updated to include comparsion of Kigurumi vs Kigurumi Mask in usage, and the results are summarized as follows:
+
+Of the 76 makers that used Kigurumi, 46 used Kigurumi without any mention of Kigurumi Mask, while the remaining 30 did use Kigurumi Mask in some capacity.
+
+In general websites were the most likely to use the term Kigurumi Mask, possibly owing to the storefront and gallery natures of many of the sites.
+
+On X, Kigurumi Mask usage was a fraction of plain Kigurumi usage across general usage in posts, as hashtags, and in bios. In general posts this was 143 instances of kigurumi vs 11 of kigurumi mask, in hashtag 587 uses of Kigurumi vs 82 of Kigurumi Mask, and in bios 50 mentions of Kigurumi vs 13 of Kigurumi Mask.
+
+The full August 11th script output is available [here](https://github.com/kamen-kigu/scan-animegao-script/blob/main/scan-output-Aug11.txt) and can be used to further inspect the results.
+
+This will hopefully be the last addendum to this publication.
