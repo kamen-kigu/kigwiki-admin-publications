@@ -2336,7 +2336,7 @@ The only real usage on social media from makers is by GKO, who tends to include 
 ## Kigurumi vs Kigurumi Mask - August 11th Addendum
 
 This addendum comes two days after the initial posting of this publication, and is a follow up to the initial scan.
-The script was updated to include comparsion of Kigurumi vs Kigurumi Mask in usage, and the results are summarized as follows:
+The script was updated to include comparison of Kigurumi vs Kigurumi Mask in usage, and the results are summarized as follows:
 
 Of the 76 makers that used Kigurumi, 46 used Kigurumi without any mention of Kigurumi Mask, while the remaining 30 did use Kigurumi Mask in some capacity.
 
